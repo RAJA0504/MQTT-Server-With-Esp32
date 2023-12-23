@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MQTT Subscriber</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <script>
+    let mqtt = new Paho.MQTT.Client('broker.hivemq.com', 8000, 'subscriberjs');
+    mqtt.onConnectionLost = onConnectionLost;
+    mqtt.onMessageArrived = onMessageArrived;
+    mqtt.connect({
+      onSuccess: onConnect,
+      onFailure: onFailure
+    });
+    function onConnect() {
+      console.log('Connected to MQTT server');
+      mqtt.subscribe('MQTT/ESP32/LED');
+    }
+    function onFailure() {
+      console.log('Failed to connect to MQTT server');
+    }
+    function onConnectionLost(responseObject) {
+      if (responseObject.errorCode !== 0) {
+        console.log('Connection lost: ' + responseObject.errorMessage);
+      }
+    }
+    function onMessageArrived(message) {
+      console.log('Message arrived: ' + message.payloadString);
+      var messageContainer = document.getElementById('messageContainer');
+      messageContainer.innerHTML += '<p>' + message.payloadString + '</p>';
+    }
+  </script>
+</head>
+<body>
+  <h2>MQTT Subscriber</h2>
+  <div id="messageContainer"></div>
+</body>
+</html>

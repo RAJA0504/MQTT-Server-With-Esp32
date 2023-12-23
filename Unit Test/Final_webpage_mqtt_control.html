@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Platform With ESP32 Board</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <script>
+        let mqtt = new Paho.MQTT.Client(
+            "broker.hivemq.com",
+            8000,
+            "clientjs"
+        );
+
+        // Set callback handlers
+        mqtt.onConnectionLost = onConnectionLost;
+        mqtt.onMessageArrived = onMessageArrived;
+
+        // Connect to the MQTT broker
+        mqtt.connect({
+            onSuccess: onConnect,
+            onFailure: onFailure
+        });
+
+        function onConnect() {
+            console.log("Connected to MQTT server");
+        }
+
+        function onFailure() {
+            console.log("Failed to connect to MQTT server");
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("Connection lost: " + responseObject.errorMessage);
+            }
+        }
+
+        function onMessageArrived(message) {
+            console.log("Message arrived: " + message.payloadString);
+            // Handle incoming MQTT messages here
+        }
+
+        function createButtonClickHandler(led) {
+            let isOn = false; // Flag to track the state
+
+            return function () {
+                var topic = 'MQTT/ESP32/LED';
+                var action = isOn ? 'off' : 'on';
+                var payload = action + '_' + led;
+                // Publish a message to the MQTT broker
+                mqtt.send(topic, payload);
+                console.log(payload); // Log the payload for debugging
+                isOn = !isOn; // Toggle the state
+
+                // Update the button's appearance based on the state
+                var button = document.getElementById("button" + led);
+                button.innerText = "LED " + led + " (" + (isOn ? "ON" : "OFF") + ")";
+            };
+        }
+
+        function createButtons() {
+            // Get the number of buttons from the input
+            var buttonCount = document.getElementById("buttonCount").value;
+
+            // Clear the existing buttons
+            document.getElementById("buttonContainer").innerHTML = '';
+
+            // Create new buttons with different commands
+            for (var i = 1; i <= buttonCount; i++) {
+                var button = document.createElement("button");
+                button.innerText = "LED " + i;
+
+                // Assign a unique command or action to each button
+                button.onclick = createButtonClickHandler(i);
+
+                // Assign a unique ID to each button
+                button.id = "button" + i;
+
+                // Append the button to the container
+                document.getElementById("buttonContainer").appendChild(button);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h2>MQTT Platform With ESP32 Board</h2>
+
+    <label for="buttonCount">Enter the number of buttons:</label>
+    <input type="number" id="buttonCount" min="0" value="0">
+    <button onclick="createButtons()">Create Buttons</button>
+
+    <div id="buttonContainer"></div>
+</body>
+
+</html>

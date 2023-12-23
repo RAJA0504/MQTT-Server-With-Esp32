@@ -1,0 +1,34 @@
+
+This directory is intended for the project.
+
+Here is the structure of the following project file:
+
+|--lib
+
+|--Test code 1
+|  |--Webserver_esp32_control_multiple_actuator
+|  |  | -Webserver_esp32_control_multiple_actuator.ide
+
+|--Test code 2
+|  |--mqtt_webserver_actuator_control
+|  |--Final_webpage_mqtt_control
+|  |  | -mqtt_webserver_actuator_control.ide
+
+|--Unit test
+|  |--Final_webpage_mqtt_control.html
+|  |--receiver_mqtt_page.html
+
+|- README --> THIS FILE
+
+Test code 1: 
+      Create a web server on ESP32 for actuator control.
+      That ask users to specify the number of buttons.
+      Already assign button numbers to corresponding ESP32 pin numbers.
+      And uses to control for particular actuator.
+
+Test code 2:
+      Create a webserver on ESP32 that works as a central node or receiver for actuator control.
+      Create a Server based on HTML that ask users to specify the number of buttons and send the Particular command via MQTT.
+      Already assign button number to the corresponding ESP32 pin numbers.
+      Receiver server receive the Command and then send it to the ESP32 board.
+      And it uses to control for the particular actuator.
